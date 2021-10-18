@@ -4,11 +4,9 @@ import setuptools as st
 
 
 if __name__ == "__main__":
-    # Long description
     with open("README.md") as f:
         long_desc = f.read()
 
-    # Setup
     st.setup(
         name="notelist-cli",
         version="0.1.0",
@@ -27,7 +25,8 @@ if __name__ == "__main__":
         python_requires=">=3.9.0",
         install_requires=[
             "click==8.0.3",
-            "requests==2.26.0"
+            "requests==2.26.0",
+            "userconf==0.4.0"
         ],
         packages=[
             "notelist_cli"
