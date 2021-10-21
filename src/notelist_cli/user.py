@@ -101,10 +101,10 @@ def get(id: str):
         print("Enabled:" + (" " * 7) + enabled)
 
         if name is not None:
-            print(f"Name: {name}")
+            print("Name:" + (" " * 10) + name)
 
         if email is not None:
-            print(f"E-mail: {email}")
+            print("E-mail:" + (" " * 8) + email)
     except Exception as e:
         echo(f"Error: {str(e)}")
         sys.exit(1)
