@@ -1,7 +1,7 @@
 """User module."""
 
 import sys
-from click import group, option, Choice, echo
+from click import group, option, confirmation_option, Choice, echo
 
 from notelist_cli.auth import request, check_response
 
@@ -9,6 +9,9 @@ from notelist_cli.auth import request, check_response
 # Endpoints
 users_ep = "/users/users"
 user_ep = "/users/user"
+
+# Messages
+del_confirm = "Are you sure that you want to delete the user?"
 
 
 def get_ls_header() -> str:
@@ -151,6 +154,11 @@ def put_user(
     try:
         r = request(method, endpoint, True, data)
         check_response(r)
+
+        m = r.json().get("message")
+
+        if m is not None:
+            echo(m)
     except Exception as e:
         echo(f"Error: {str(e)}")
         sys.exit(1)
@@ -214,3 +222,22 @@ def update(
     """
     ep = f"{user_ep}/{id}"
     put_user("PUT", ep, username, password, admin, enabled, name, email)
+
+
+@user.command()
+@option("--id", prompt=True, help="User ID.")
+@confirmation_option(prompt=del_confirm)
+def delete(id: str):
+    """Delete a user."""
+    try:
+        ep = f"{user_ep}/{id}"
+        r = request("DELETE", ep, True)
+        check_response(r)
+
+        m = r.json().get("message")
+
+        if m is not None:
+            echo(m)
+    except Exception as e:
+        echo(f"Error: {str(e)}")
+        sys.exit(1)
