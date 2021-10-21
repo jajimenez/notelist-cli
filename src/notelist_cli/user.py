@@ -1,7 +1,7 @@
 """User module."""
 
 import sys
-from click import group, option, echo
+from click import group, option, Choice, echo
 
 from notelist_cli.auth import request, check_response
 
@@ -12,16 +12,22 @@ user_ep = "/users/user"
 
 
 def get_ls_header() -> str:
-    """Return the header."""
+    """Get the header in the User Ls command.
+
+    :returns: Header.
+    """
     return (
         "ID" + (" " * 31) + "| Username" + (" " * 13) + "| Administrator | "
         "Enabled |\n")
 
 
 def get_ls_user_line(user: dict) -> str:
-    """Return a string representing a user."""
-    line = user["id"] + " | "
+    """Get a string representing a user in the User Ls command.
 
+    :param user: User data.
+    :returns: User string.
+    """
+    line = user["id"] + " | "
     username = user.get("username", "")
     c = len(username)
 
@@ -110,19 +116,14 @@ def get(id: str):
         sys.exit(1)
 
 
-@user.command()
-@option("--username", prompt=True)
-@option("--password", prompt=True, hide_input=True)
-@option("--admin", prompt=True, default=False)
-@option("--enabled", prompt=True, default=False)
-@option("--name", prompt=True, default="")
-@option("--email", prompt=True, default="")
-def create(
-    username: str, password: str, admin: bool, enabled: bool, name: str,
-    email: str
+def put_user(
+    method: str, endpoint: str, username: str, password: str, admin: str,
+    enabled: str, name: str, email: str
 ):
-    """Create a user.
+    """Put (create or update) a user.
 
+    :param method: Request method ("POST" or "PUT").
+    :param endpoint: Request endpoint.
     :param username: Username.
     :param password: Password.
     :param admin: Whether the user is an administrator or not.
@@ -130,12 +131,19 @@ def create(
     :param name: Name.
     :param email: E-mail.
     """
-    data = {
-        "username": username,
-        "password": password,
-        "admin": admin,
-        "enabled": enabled
-    }
+    data = {}
+
+    if username != "":
+        data["username"] = username
+
+    if password != "":
+        data["password"] = password
+
+    if admin != "":
+        data["admin"] = bool(int(admin))
+
+    if enabled != "":
+        data["enabled"] = bool(int(enabled))
 
     if name != "":
         data["name"] = name
@@ -144,8 +152,68 @@ def create(
         data["email"] = email
 
     try:
-        r = request("POST", user_ep, True, data)
+        r = request(method, endpoint, True, data)
         check_response(r)
     except Exception as e:
         echo(f"Error: {str(e)}")
         sys.exit(1)
+
+
+@user.command()
+@option("--username", prompt=True, help="Username")
+@option("--password", prompt=True, hide_input=True, help="Password")
+@option(
+    "--admin", prompt=True, type=Choice(["0", "1"]), default="0",
+    help="Whether the user is an administrator or not."
+)
+@option(
+    "--enabled", prompt=True, type=Choice(["0", "1"]), default="0",
+    help="Whether the user is enabled or not."
+)
+@option("--name", prompt=True, default="", help="Name")
+@option("--email", prompt=True, default="", help="E-mail")
+def create(
+    username: str, password: str, admin: str, enabled: str, name: str,
+    email: str
+):
+    """Create a user.
+
+    "name" and "email" parameters are optional and can be left empty in order
+    to not update them.
+    """
+    put_user("POST", user_ep, username, password, admin, enabled, name, email)
+
+
+@user.command()
+@option("--id", prompt=True, help="ID of the user to update.")
+@option("--username", prompt=True, default="", help="New username.")
+@option(
+    "--password", prompt=True, default="", hide_input=True,
+    help="New password."
+)
+@option(
+    "--admin", prompt=True, type=Choice(["", "0", "1"]), default="",
+    help="New Admin (whether the user is an administrator or not)."
+)
+@option(
+    "--enabled", prompt=True, type=Choice(["", "0", "1"]), default="",
+    help="New Enabled (whether the user is enabled or not)."
+)
+@option("--name", prompt=True, default="", help="New name.")
+@option("--email", prompt=True, default="", help="New e-mail.")
+def update(
+    id: str, username: str, password: str, admin: str, enabled: str, name: str,
+    email: str
+):
+    """Update a user.
+
+    All parameters are optional and can be left empty in order to not update
+    them.
+
+    "username", "admin" and "enabled" parameters can be updated only by
+    administrators users. If the user doing the update operation is not an
+    administrator and tries to update any of these fields, an Unknown Field
+    error is returned.
+    """
+    ep = f"{user_ep}/{id}"
+    put_user("PUT", ep, username, password, admin, enabled, name, email)
