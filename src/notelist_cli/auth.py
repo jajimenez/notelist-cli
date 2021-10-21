@@ -167,7 +167,11 @@ def auth():
 @option("--username", prompt=True)
 @option("--password", prompt=True, hide_input=True)
 def login(username: str, password: str):
-    """Log in."""
+    """Log in.
+
+    :param username: Username.
+    :param password: Password.
+    """
     try:
         # Make request
         _api_url = get_api_url()
