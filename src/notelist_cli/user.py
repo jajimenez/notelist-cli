@@ -64,4 +64,5 @@ def ls():
         if m is not None:
             echo("\n" + m)
     except Exception as e:
-        sys.exit(f"Error: {str(e)}")
+        echo(f"Error: {str(e)}")
+        sys.exit(1)

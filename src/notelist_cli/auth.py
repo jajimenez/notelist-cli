@@ -28,7 +28,6 @@ api_url_error = 'API URL not found. Please run "notelist-cli config".'
 login_me = 'Please run "notelist-cli auth login".'
 acc_tok_error = f"Access token not found. {login_me}"
 ref_tok_error = f"Refresh token not found. {login_me}"
-auth_error = f"Authentication tokens expired. {login_me}"
 
 
 def get_api_url() -> str:
@@ -146,11 +145,16 @@ def check_response(r: Response):
     :param r: Request response.
     """
     data = r.json()
-    typ = data.get("message_type")
+
+    m = data.get("message")
+    t = data.get("message_type")
 
     if r.status_code != 200:
-        m = auth_error if typ == "error_expired_token" else "Unknown error"
-        sys.exit(m)
+        if t == "error_expired_token":
+            m += ". " + login_me
+
+        echo(m)
+        sys.exit(1)
 
 
 @group()
@@ -185,7 +189,8 @@ def login(username: str, password: str):
         if m is not None:
             echo(m)
     except Exception as e:
-        sys.exit(f"Error: {str(e)}")
+        echo(f"Error: {str(e)}")
+        sys.exit(1)
 
 
 @auth.command()
@@ -210,4 +215,5 @@ def logout():
         if m is not None:
             echo(m)
     except Exception as e:
-        sys.exit(f"Error: {str(e)}")
+        echo(f"Error: {str(e)}")
+        sys.exit(1)
