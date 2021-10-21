@@ -164,14 +164,10 @@ def auth():
 
 
 @auth.command()
-@option("--username", prompt=True)
-@option("--password", prompt=True, hide_input=True)
+@option("--username", prompt=True, help="Username.")
+@option("--password", prompt=True, hide_input=True, help="Password.")
 def login(username: str, password: str):
-    """Log in.
-
-    :param username: Username.
-    :param password: Password.
-    """
+    """Log in."""
     try:
         # Make request
         _api_url = get_api_url()

@@ -76,12 +76,9 @@ def ls():
 
 
 @user.command()
-@option("--id", prompt=True)
+@option("--id", prompt=True, help="User ID.")
 def get(id: str):
-    """Get a user.
-
-    :param id: User ID.
-    """
+    """Get a user."""
     try:
         ep = f"{user_ep}/{id}"
         r = request("GET", ep, True)
