@@ -5,6 +5,7 @@ from typing import Optional
 
 import requests as req
 from click import group, option, echo
+from requests.models import Response
 from userconf import Userconf
 
 
@@ -24,7 +25,10 @@ logout_ep = "/auth/logout"
 
 # Error messages
 api_url_error = 'API URL not found. Please run "notelist-cli config".'
-acc_tok_error = 'Access token not found. Please run "notelist-cli auth login".'
+login_me = 'Please run "notelist-cli auth login".'
+acc_tok_error = f"Access token not found. {login_me}"
+ref_tok_error = f"Refresh token not found. {login_me}"
+auth_error = f"Authentication tokens expired. {login_me}"
 
 
 def get_api_url() -> str:
@@ -49,12 +53,27 @@ def get_acc_tok() -> str:
 
     :returns: Access token.
     """
-    _api_url = uc.get(api_url)
+    token = uc.get(acc_tok)
 
-    if _api_url is None:
-        raise Exception(api_url_error)
+    if token is None:
+        raise Exception(acc_tok_error)
 
-    return _api_url
+    return token
+
+
+def get_ref_tok() -> str:
+    """Get the refresh token.
+
+    An `Exception` is raised if the access token is not found.
+
+    :returns: Access token.
+    """
+    token = uc.get(ref_tok)
+
+    if token is None:
+        raise Exception(ref_tok_error)
+
+    return token
 
 
 def refresh_access_token() -> req.Response:
@@ -63,16 +82,16 @@ def refresh_access_token() -> req.Response:
     :returns: Request response.
     """
     _api_url = get_api_url()
-    old_at = get_acc_tok()
+    ref = get_ref_tok()
 
-    url = f"{_api_url}/{refresh_ep}"
-    headers = {"Authorization": f"Bearer {old_at}"}
+    url = f"{_api_url}{refresh_ep}"
+    headers = {"Authorization": f"Bearer {ref}"}
     r = req.get(url, headers=headers)
 
     # Update access token
     if r.status_code == 200:
-        new_at = r.json()["result"]["access_token"]
-        uc.set(acc_tok, new_at)
+        acc = r.json()["result"]["access_token"]
+        uc.set(acc_tok, acc)
 
     return r
 
@@ -92,7 +111,7 @@ def request(
     :returns: Request response.
     """
     _api_url = get_api_url()
-    url = f"{_api_url}/{endpoint}"
+    url = f"{_api_url}{endpoint}"
     args = {}
 
     # Headers
@@ -109,7 +128,10 @@ def request(
 
     # If the access token is expired, we make the request again with a new, not
     # fresh, access token.
-    if r.json().get("message_type") == "error_expired_token" and retry:
+    k = "message_type"
+    t = "error_expired_token"
+
+    if r.json().get(k) == t and retry:
         r = refresh_access_token()
 
         if r.status_code == 200:
@@ -118,9 +140,22 @@ def request(
     return r
 
 
+def check_response(r: Response):
+    """Check a response and quit the application if there is an error.
+
+    :param r: Request response.
+    """
+    data = r.json()
+    typ = data.get("message_type")
+
+    if r.status_code != 200:
+        m = auth_error if typ == "error_expired_token" else "Unknown error"
+        sys.exit(m)
+
+
 @group()
 def auth():
-    """Do an authentication operation."""
+    """Log in or log out."""
     pass
 
 
@@ -132,20 +167,23 @@ def login(username: str, password: str):
     try:
         # Make request
         _api_url = get_api_url()
-        url = f"{_api_url}/{login_ep}"
+        url = f"{_api_url}{login_ep}"
 
         data = {"username": username, "password": password}
         r = req.post(url, json=data)
         d = r.json()
-        res = d["result"]
+        res = d.get("result")
+        m = d.get("message")
 
-        # Save credentials
-        uc.set(user_id, res["user_id"])
-        uc.set(acc_tok, res["access_token"])
-        uc.set(ref_tok, res["refresh_token"])
+        if res is not None:
+            # Save credentials
+            uc.set(user_id, res["user_id"])
+            uc.set(acc_tok, res["access_token"])
+            uc.set(ref_tok, res["refresh_token"])
 
         # Print response message
-        echo(d["message"])
+        if m is not None:
+            echo(m)
     except Exception as e:
         sys.exit(f"Error: {str(e)}")
 
@@ -156,18 +194,20 @@ def logout():
     try:
         # Make request
         _api_url = get_api_url()
-        url = f"{_api_url}/{logout_ep}"
+        url = f"{_api_url}{logout_ep}"
 
         at = uc.get(acc_tok)
         headers = {"Authorization": f"Bearer {at}"}
 
         r = req.get(url, headers=headers)
+        m = r.json().get("message")
 
         # Delete credentials
         for i in (user_id, acc_tok, ref_tok):
             uc.delete(i)
 
         # Print response message
-        echo(r.json()["message"])
+        if m is not None:
+            echo(m)
     except Exception as e:
         sys.exit(f"Error: {str(e)}")
