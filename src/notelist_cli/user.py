@@ -7,8 +7,8 @@ from notelist_cli.auth import request, check_response
 
 
 # Endpoints
-ls_ep = "/users/users"
-get_ep = "/users/user/{}"
+users_ep = "/users/users"
+user_ep = "/users/user"
 
 
 def get_ls_header() -> str:
@@ -47,7 +47,7 @@ def user():
 def ls():
     """List all the users."""
     try:
-        r = request("GET", ls_ep, True)
+        r = request("GET", users_ep, True)
         check_response(r)
 
         d = r.json()
@@ -72,12 +72,12 @@ def ls():
 @user.command()
 @option("--id", prompt=True)
 def get(id: str):
-    """Get a user data.
+    """Get a user.
 
     :param id: User ID.
     """
     try:
-        ep = get_ep.format(id)
+        ep = f"{user_ep}/{id}"
         r = request("GET", ep, True)
         check_response(r)
 
@@ -105,6 +105,47 @@ def get(id: str):
 
         if email is not None:
             print(f"E-mail: {email}")
+    except Exception as e:
+        echo(f"Error: {str(e)}")
+        sys.exit(1)
+
+
+@user.command()
+@option("--username", prompt=True)
+@option("--password", prompt=True, hide_input=True)
+@option("--admin", prompt=True, default=False)
+@option("--enabled", prompt=True, default=False)
+@option("--name", prompt=True, default="")
+@option("--email", prompt=True, default="")
+def create(
+    username: str, password: str, admin: bool, enabled: bool, name: str,
+    email: str
+):
+    """Create a user.
+
+    :param username: Username.
+    :param password: Password.
+    :param admin: Whether the user is an administrator or not.
+    :param enabled: Whether the user is enabled or not.
+    :param name: Name.
+    :param email: E-mail.
+    """
+    data = {
+        "username": username,
+        "password": password,
+        "admin": admin,
+        "enabled": enabled
+    }
+
+    if name != "":
+        data["name"] = name
+
+    if email != "":
+        data["email"] = email
+
+    try:
+        r = request("POST", user_ep, True, data)
+        check_response(r)
     except Exception as e:
         echo(f"Error: {str(e)}")
         sys.exit(1)
