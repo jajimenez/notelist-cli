@@ -189,7 +189,7 @@ def login(username: str, password: str):
         if m is not None:
             echo(m)
     except Exception as e:
-        echo(f"Error: {str(e)}")
+        echo(f"Error: {e}")
         sys.exit(1)
 
 
@@ -215,5 +215,5 @@ def logout():
         if m is not None:
             echo(m)
     except Exception as e:
-        echo(f"Error: {str(e)}")
+        echo(f"Error: {e}")
         sys.exit(1)
