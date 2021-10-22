@@ -32,7 +32,7 @@ def get_ls_user_line(user: dict) -> str:
     :returns: User string.
     """
     line = user["id"] + " | "
-    username = user.get("username", "")
+    username = user.get("username")
     c = len(username)
 
     if c <= 20:
@@ -40,9 +40,12 @@ def get_ls_user_line(user: dict) -> str:
     else:
         username = f"{username[:17]}..."
 
+    admin = "Yes" if user["admin"] else "No "
+    enabled = "Yes" if user["enabled"] else "No "
+
     line += username + " | "
-    line += str(int(user["admin"])) + (" " * 13) + "| "
-    line += str(int(user["enabled"])) + (" " * 7) + "|"
+    line += admin + (" " * 11) + "| "
+    line += enabled + (" " * 5) + "|"
 
     return line
 
