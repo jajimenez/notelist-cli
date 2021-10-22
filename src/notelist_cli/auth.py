@@ -26,6 +26,7 @@ logout_ep = "/auth/logout"
 # Error messages
 api_url_error = 'API URL not found. Please run "notelist-cli config".'
 login_me = 'Please run "notelist-cli auth login".'
+uid_error = f"User ID not found. {login_me}"
 acc_tok_error = f"Access token not found. {login_me}"
 ref_tok_error = f"Refresh token not found. {login_me}"
 
@@ -43,6 +44,21 @@ def get_api_url() -> str:
         raise Exception(api_url_error)
 
     return _api_url
+
+
+def get_user_id() -> str:
+    """Get the user ID.
+
+    An `Exception` is raised if the user ID is not found.
+
+    :returns: User ID.
+    """
+    _id = uc.get(user_id)
+
+    if _id is None:
+        raise Exception(uid_error)
+
+    return _id
 
 
 def get_acc_tok() -> str:
@@ -159,7 +175,7 @@ def check_response(r: Response):
 
 @group()
 def auth():
-    """Log in or log out."""
+    """Log in/out."""
     pass
 
 

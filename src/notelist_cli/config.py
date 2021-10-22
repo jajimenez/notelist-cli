@@ -14,5 +14,5 @@ uc = Userconf(app_id)
 @command()
 @option("--api-url", prompt=True, help="Notelist API URL.")
 def config(api_url: str):
-    """Configure this application."""
+    """Configure CLI."""
     uc.set(_api_url, api_url)
