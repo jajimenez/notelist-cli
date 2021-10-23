@@ -9,6 +9,7 @@ from notelist_cli.config import config
 from notelist_cli.admin import admin
 from notelist_cli.auth import auth
 from notelist_cli.user import user
+from notelist_cli.notebook import notebook
 
 
 __version__ = "0.1.0"
@@ -24,3 +25,4 @@ cli.add_command(config)
 cli.add_command(admin)
 cli.add_command(auth)
 cli.add_command(user)
+cli.add_command(notebook)

@@ -196,7 +196,7 @@ def create(
 
 
 @user.command()
-@option("--id", prompt=True, help="ID of the user to update.")
+@option("--id", prompt=True, help="User ID.")
 @option("--username", prompt=True, help="Username.")
 @option(
     "--password", prompt=True, confirmation_prompt="Repeat password",

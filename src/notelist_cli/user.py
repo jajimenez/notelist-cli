@@ -66,8 +66,6 @@ def update(password: str, name: str, email: str):
 
     If the "--password" parameter is not set, its value is prompted and hidden.
     """
-    _id = get_user_id()
-    ep = f"{user_ep}/{_id}"
     data = {"password": password}
 
     if name != "":
@@ -80,6 +78,9 @@ def update(password: str, name: str, email: str):
         # Get current data. If the current user is an administrator, we need to
         # send the current values of the "username", "admin" and "enabled"
         # fields to avoid a validation error.
+        _id = get_user_id()
+        ep = f"{user_ep}/{_id}"
+
         r = request("GET", ep, True)
         check_response(r)
         user = r.json().get("result")
