@@ -8,6 +8,7 @@ from notelist_cli.auth import request, check_response
 
 
 # Endpoints
+notebook_ep = "/notebooks/notebook"
 notes_ep = "/notes/notes"
 note_ep = "/notes/note"
 
@@ -123,13 +124,15 @@ def ls(
         if res is None:
             raise Exception("Data not received.")
 
-        echo(get_ls_header())
+        echo("\n" + get_ls_header())
 
         for n in res:
             echo(get_ls_note_line(n))
 
         if m is not None:
             echo("\n" + m)
+
+        echo()
     except Exception as e:
         echo(f"Error: {e}")
         sys.exit(1)
@@ -140,6 +143,7 @@ def ls(
 def get(id: str):
     """Get a note."""
     try:
+        # Get note
         ep = f"{note_ep}/{id}"
         r = request("GET", ep, True)
         check_response(r)
@@ -150,22 +154,48 @@ def get(id: str):
         if res is None:
             raise Exception("Data not received.")
 
-        # Note data
-        _id = res.get("id")
+        _id = res["id"]
+        nb_id = res["notebook_id"]
         archived = "Yes" if res["archived"] else "No"
-        title = res.get("title", "")
+        title = res.get("title")
         tags = res.get("tags")
-        tags = ", ".join(tags) if tags is not None else ""
+        created = res["created"].replace("T", " ")
+        last_mod = res["last_modified"].replace("T", " ")
         body = res.get("body")
 
-        print(f"ID:       {_id}")
-        print(f"Archived: {archived}")
-        print(f"Title:    {title}")
-        print(f"Tags:     {tags}")
-        print("Body:")
+        # Get notebook name
+        ep = f"{notebook_ep}/{nb_id}"
+        r = request("GET", ep, True)
+        check_response(r)
+
+        d = r.json()
+        res = d.get("result")
+
+        if res is None:
+            raise Exception("Data not received.")
+
+        nb_name = res["name"]
+
+        # Print note
+        echo("\nID:" + (" " * 12) + _id)
+        echo("Notebook ID:" + (" " * 3) + nb_id)
+        echo(f"Notebook name: {nb_name}")
+        echo("Archived:" + (" " * 6) + archived)
+
+        if title is not None:
+            echo("Title:" + (" " * 9) + title)
+
+        if tags is not None:
+            tags = ", ".join(tags)
+            echo("Tags:" + (" " * 10) + tags)
+
+        echo("Created:" + (" " * 7) + created)
+        echo(f"Last modified: {last_mod}")
 
         if body is not None:
-            print(body)
+            echo("\n" + body)
+
+        echo()
     except Exception as e:
         echo(f"Error: {e}")
         sys.exit(1)

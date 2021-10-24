@@ -65,13 +65,15 @@ def ls():
         if res is None:
             raise Exception("Data not received.")
 
-        echo(get_ls_header())
+        echo("\n" + get_ls_header())
 
         for n in res:
             echo(get_ls_notebook_line(n))
 
         if m is not None:
             echo("\n" + m)
+
+        echo()
     except Exception as e:
         echo(f"Error: {e}")
         sys.exit(1)
@@ -93,24 +95,24 @@ def get(id: str):
             raise Exception("Data not received.")
 
         # Notebook data
-        _id = res.get("id")
-        name = res.get("name")
+        _id = res["id"]
+        name = res["name"]
         tag_colors = res.get("tag_colors")
+        created = res["created"].replace("T", " ")
+        last_mod = res["last_modified"].replace("T", " ")
 
         if tag_colors is not None:
             tag_colors = [f"{i}={v}" for i, v in tag_colors.items()]
             tag_colors = ", ".join(tag_colors)
-            id_bs = 9
-            na_bs = 7
-        else:
-            id_bs = 3
-            na_bs = 1
 
-        print("ID:" + (" " * id_bs) + _id)
-        print(f"Name:" + (" " * na_bs) + name)
+        echo("\nID:" + (" " * 12) + _id)
+        echo(f"Name:" + (" " * 10) + name)
 
         if tag_colors is not None:
-            print(f"Tag colors: {tag_colors}")
+            echo(f"Tag colors:" + (" " * 4) + tag_colors)
+
+        echo("Created:" + (" " * 7) + created)
+        echo(f"Last modified: {last_mod}\n")
     except Exception as e:
         echo(f"Error: {e}")
         sys.exit(1)

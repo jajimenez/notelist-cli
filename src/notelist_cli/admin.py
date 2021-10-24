@@ -42,7 +42,7 @@ def get_ls_user_line(user: dict) -> str:
     :returns: User string.
     """
     line = user["id"] + " | "
-    username = user.get("username")
+    username = user["username"]
     c = len(username)
 
     if c <= 20:
@@ -86,13 +86,15 @@ def ls():
         if res is None:
             raise Exception("Data not received.")
 
-        echo(get_ls_header())
+        echo("\n" + get_ls_header())
 
         for u in res:
             echo(get_ls_user_line(u))
 
         if m is not None:
             echo("\n" + m)
+
+        echo()
     except Exception as e:
         echo(f"Error: {e}")
         sys.exit(1)
@@ -114,14 +116,16 @@ def get(id: str):
             raise Exception("Data not received.")
 
         # User data
-        _id = res.get("id")
-        username = res.get("username")
-        admin = str(int(res.get("admin")))
-        enabled = str(int(res.get("enabled")))
+        _id = res["id"]
+        username = res["username"]
+        admin = "Yes" if res["admin"] else "No"
+        enabled = "Yes" if res["enabled"] else "No"
         name = res.get("name")
         email = res.get("email")
+        created = res["created"].replace("T", " ")
+        last_mod = res["last_modified"].replace("T", " ")
 
-        print("ID:" + (" " * 12) + _id)
+        print("\nID:" + (" " * 12) + _id)
         print("Username: " + (" " * 5) + username)
         print(f"Administrator: {admin}")
         print("Enabled:" + (" " * 7) + enabled)
@@ -131,6 +135,9 @@ def get(id: str):
 
         if email is not None:
             print("E-mail:" + (" " * 8) + email)
+
+        echo("Created:" + (" " * 7) + created)
+        echo(f"Last modified: {last_mod}\n")
     except Exception as e:
         echo(f"Error: {e}")
         sys.exit(1)

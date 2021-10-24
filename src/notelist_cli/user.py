@@ -39,23 +39,28 @@ def get():
             raise Exception("Data not received.")
 
         # User data
-        _id = res.get("id")
-        username = res.get("username")
-        admin = str(int(res.get("admin")))
-        enabled = str(int(res.get("enabled")))
+        _id = res["id"]
+        username = res["username"]
+        admin = "Yes" if res["admin"] else "No"
+        enabled = "Yes" if res["enabled"] else "No"
         name = res.get("name")
         email = res.get("email")
+        created = res["created"].replace("T", " ")
+        last_mod = res["last_modified"].replace("T", " ")
 
-        print("ID:" + (" " * 12) + _id)
-        print("Username: " + (" " * 5) + username)
-        print(f"Administrator: {admin}")
-        print("Enabled:" + (" " * 7) + enabled)
+        echo("\nID:" + (" " * 12) + _id)
+        echo("Username: " + (" " * 5) + username)
+        echo(f"Administrator: {admin}")
+        echo("Enabled:" + (" " * 7) + enabled)
 
         if name is not None:
-            print("Name:" + (" " * 10) + name)
+            echo("Name:" + (" " * 10) + name)
 
         if email is not None:
-            print("E-mail:" + (" " * 8) + email)
+            echo("E-mail:" + (" " * 8) + email)
+
+        echo("Created:" + (" " * 7) + created)
+        echo(f"Last modified: {last_mod}\n")
     except Exception as e:
         echo(f"Error: {e}")
         sys.exit(1)
