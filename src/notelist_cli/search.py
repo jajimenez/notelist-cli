@@ -4,7 +4,7 @@ import sys
 
 from click import command, option, echo
 
-from notelist_cli.auth import get_user_id, request, check_response
+from notelist_cli.auth import request, check_response
 from notelist_cli.notebook import print_notebooks
 from notelist_cli.note import print_notes
 
