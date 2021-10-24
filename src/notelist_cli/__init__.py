@@ -19,7 +19,10 @@ __version__ = "0.1.0"
 
 @group()
 def cli():
-    """Notelist CLI is a command line interface for the Notelist API."""
+    """Welcome to Notelist CLI 0.1.0.
+
+    Notelist CLI is a command line interface for the Notelist API.
+    """
     pass
 
 
