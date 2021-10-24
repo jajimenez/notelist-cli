@@ -11,6 +11,16 @@ from notelist_cli.auth import request, check_response
 users_ep = "/users/users"
 user_ep = "/users/user"
 
+# Option descriptions
+des_user = "User ID."
+des_username = "Username."
+des_password_1 = "Password."
+des_password_2 = "Repeat password"
+des_admin = "Whether the user is an administrator or not."
+des_enabled = "Whether the user is enabled or not."
+des_name = "Name."
+des_email = "E-mail."
+
 # Messages
 del_confirm = "Are you sure that you want to delete the user?"
 
@@ -89,7 +99,7 @@ def ls():
 
 
 @user.command()
-@option("--id", prompt=True, help="User ID.")
+@option("--id", required=True, help=des_user)
 def get(id: str):
     """Get a user."""
     try:
@@ -168,20 +178,15 @@ def put_user(
 
 
 @user.command()
-@option("--username", prompt=True, help="Username.")
+@option("--username", prompt=True, help=des_username)
 @option(
-    "--password", prompt=True, confirmation_prompt="Repeat password",
-    hide_input=True, help="Password."
+    "--password", prompt=True, confirmation_prompt=des_password_2,
+    hide_input=True, help=des_password_1
 )
-@option(
-    "--admin", prompt=True, default=False,
-    help="Whether the user is an administrator or not."
-)
-@option(
-    "--enabled", prompt=True, default=False,
-    help="Whether the user is enabled or not.")
-@option("--name", prompt=True, default="", help="Name.")
-@option("--email", prompt=True, default="", help="E-mail.")
+@option("--admin", default=False, prompt=True, help=des_admin)
+@option("--enabled", default=False, prompt=True, help=des_enabled)
+@option("--name", default="", prompt=True, help=des_name)
+@option("--email", default="", prompt=True, help=des_email)
 def create(
     username: str, password: str, admin: bool, enabled: bool, name: str,
     email: str
@@ -196,20 +201,15 @@ def create(
 
 
 @user.command()
-@option("--id", prompt=True, help="User ID.")
-@option("--username", prompt=True, help="Username.")
+@option("--id", prompt=True, help=des_user)
+@option("--username", prompt=True, help=des_username)
 @option(
-    "--password", prompt=True, confirmation_prompt="Repeat password",
-    hide_input=True, help="Password.")
-@option(
-    "--admin", prompt=True, default=False,
-    help="Whether the user is an administrator or not."
-)
-@option(
-    "--enabled", prompt=True, default=False,
-    help="Whether the user is enabled or not.")
-@option("--name", prompt=True, default="", help="Name.")
-@option("--email", prompt=True, default="", help="E-mail.")
+    "--password", prompt=True, confirmation_prompt=des_password_2,
+    hide_input=True, help=des_password_1)
+@option("--admin", default=False, prompt=True, help=des_admin)
+@option("--enabled", default=False, prompt=True, help=des_enabled)
+@option("--name", default="", prompt=True, help=des_name)
+@option("--email", default="", prompt=True, help=des_email)
 def update(
     id: str, username: str, password: str, admin: bool, enabled: bool,
     name: str, email: str
@@ -229,7 +229,7 @@ def update(
 
 
 @user.command()
-@option("--id", prompt=True, help="User ID.")
+@option("--id", required=True, help=des_user)
 @confirmation_option(prompt=del_confirm)
 def delete(id: str):
     """Delete a user."""

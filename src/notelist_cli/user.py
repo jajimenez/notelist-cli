@@ -10,16 +10,22 @@ from notelist_cli.auth import get_user_id, request, check_response
 # Endpoints
 user_ep = "/users/user"
 
+# Option descriptions
+des_password_1 = "Password."
+des_password_2 = "Repeat password"
+des_name = "Name."
+des_email = "E-mail."
+
 
 @group()
 def user():
-    """Manage current user."""
+    """Manage user."""
     pass
 
 
 @user.command()
 def get():
-    """Get the current user."""
+    """Get user."""
     try:
         _id = get_user_id()
         ep = f"{user_ep}/{_id}"
@@ -57,12 +63,12 @@ def get():
 
 @user.command()
 @option(
-    "--password", prompt=True, confirmation_prompt="Repeat password",
-    hide_input=True, help="Password.")
-@option("--name", prompt=True, default="", help="Name.")
-@option("--email", prompt=True, default="", help="E-mail.")
+    "--password", prompt=True, confirmation_prompt=des_password_2,
+    hide_input=True, help=des_password_1)
+@option("--name", default="", prompt=True, help=des_name)
+@option("--email", default="", prompt=True, help=des_email)
 def update(password: str, name: str, email: str):
-    """Update the current user.
+    """Update user.
 
     If the "--password" parameter is not set, its value is prompted and hidden.
     """

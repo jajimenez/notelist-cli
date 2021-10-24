@@ -11,8 +11,13 @@ from notelist_cli.auth import request, check_response
 notebooks_ep = "/notebooks/notebooks"
 notebook_ep = "/notebooks/notebook"
 
+# Option descriptions
+des_notebook = "Notebook ID."
+des_name = "Name."
+des_tag_colors = 'Tag colors. E.g. "tag1=color1,tag2=color2".'
+
 # Messages
-del_confirm = "Are you sure that you want to delete the notebok?"
+del_confirm = "Are you sure that you want to delete the notebook?"
 
 
 def get_ls_header() -> str:
@@ -20,25 +25,23 @@ def get_ls_header() -> str:
 
     :returns: Header.
     """
-    return "ID" + (" " * 31) + "| Name" + (" " * 17) + "|\n"
+    return "ID" + (" " * 31) + "| Name\n"
 
 
 def get_ls_notebook_line(notebook: dict) -> str:
     """Get a string representing a notebook in the Notebook Ls command.
 
-    :param N: Notebook data.
+    :param notebook: Notebook data.
     :returns: Notebook string.
     """
     line = notebook["id"] + " | "
     name = notebook.get("name")
     c = len(name)
 
-    if c <= 20:
-        name = name + (" " * (20 - c))
-    else:
+    if c > 20:
         name = f"{name[:17]}..."
 
-    line += name + " |"
+    line += name
     return line
 
 
@@ -75,7 +78,7 @@ def ls():
 
 
 @notebook.command()
-@option("--id", prompt=True, help="Notebook ID.")
+@option("--id", required=True, help=des_notebook)
 def get(id: str):
     """Get a notebook."""
     try:
@@ -89,7 +92,7 @@ def get(id: str):
         if res is None:
             raise Exception("Data not received.")
 
-        # User data
+        # Notebook data
         _id = res.get("id")
         name = res.get("name")
         tag_colors = res.get("tag_colors")
@@ -97,8 +100,8 @@ def get(id: str):
         if tag_colors is not None:
             tag_colors = [f"{i}={v}" for i, v in tag_colors.items()]
             tag_colors = ", ".join(tag_colors)
-            id_bs = 5
-            na_bs = 3
+            id_bs = 9
+            na_bs = 7
         else:
             id_bs = 3
             na_bs = 1
@@ -107,7 +110,7 @@ def get(id: str):
         print(f"Name:" + (" " * na_bs) + name)
 
         if tag_colors is not None:
-            print(f"Colors: {tag_colors}")
+            print(f"Tag colors: {tag_colors}")
     except Exception as e:
         echo(f"Error: {e}")
         sys.exit(1)
@@ -126,7 +129,7 @@ def put_notebook(method: str, endpoint: str, name: str, tag_colors: str):
 
     try:
         if tag_colors != "":
-            col = tag_colors.replace(", ", ",")
+            col = tag_colors.replace(" ", "")
             col = tag_colors.split(",")
 
             for c in col:
@@ -154,29 +157,25 @@ def put_notebook(method: str, endpoint: str, name: str, tag_colors: str):
 
 
 @notebook.command()
-@option("--name", prompt=True, help="Name.")
-@option(
-    "--tag_colors", prompt=True, default="",
-    help='Tag colors. E.g. "tag1=color1,tag2=color2".')
-def create(name: str, tag_colors: str):
+@option("--name", prompt=True, help=des_name)
+@option("--tagcolors", default="", prompt=True, help=des_tag_colors)
+def create(name: str, tagcolors: str):
     """Create a notebook."""
-    put_notebook("POST", notebook_ep, name, tag_colors)
+    put_notebook("POST", notebook_ep, name, tagcolors)
 
 
 @notebook.command()
-@option("--id", prompt=True, help="Notebook ID.")
-@option("--name", prompt=True, help="Name.")
-@option(
-    "--tag_colors", prompt=True, default="",
-    help='Tag colors. E.g. "tag1=color1,tag2=color2".')
-def update(id: str, name: str, tag_colors: str):
+@option("--id", prompt=True, help=des_notebook)
+@option("--name", prompt=True, help=des_name)
+@option("--tagcolors", default="", prompt=True, help=des_tag_colors)
+def update(id: str, name: str, tagcolors: str):
     """Update a notebook."""
     ep = f"{notebook_ep}/{id}"
-    put_notebook("PUT", ep, name, tag_colors)
+    put_notebook("PUT", ep, name, tagcolors)
 
 
 @notebook.command()
-@option("--id", prompt=True, help="Notebook ID.")
+@option("--id", required=True, help=des_notebook)
 @confirmation_option(prompt=del_confirm)
 def delete(id: str):
     """Delete a notebook."""
