@@ -11,6 +11,7 @@ from notelist_cli.auth import auth
 from notelist_cli.user import user
 from notelist_cli.notebook import notebook
 from notelist_cli.note import note
+from notelist_cli.search import search
 
 
 __version__ = "0.1.0"
@@ -28,3 +29,4 @@ cli.add_command(auth)
 cli.add_command(user)
 cli.add_command(notebook)
 cli.add_command(note)
+cli.add_command(search)
