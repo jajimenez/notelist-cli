@@ -51,6 +51,17 @@ def notebook():
     pass
 
 
+def print_notebooks(notebooks: list[dict]):
+    """Print a notebook list.
+
+    :param notebooks: Notebooks.
+    """
+    echo("\n" + get_ls_header())
+
+    for n in notebooks:
+        echo(get_ls_notebook_line(n))
+
+
 @notebook.command()
 def ls():
     """List all the notebooks of the current user."""
@@ -65,11 +76,9 @@ def ls():
         if res is None:
             raise Exception("Data not received.")
 
-        echo("\n" + get_ls_header())
+        print_notebooks(res)
 
-        for n in res:
-            echo(get_ls_notebook_line(n))
-
+        # Message
         if m is not None:
             echo("\n" + m)
 

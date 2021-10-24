@@ -87,6 +87,17 @@ def note():
     pass
 
 
+def print_notes(notes: list[dict]):
+    """Print a note list.
+
+    :param notes: Notes.
+    """
+    echo("\n" + get_ls_header())
+
+    for n in notes:
+        echo(get_ls_note_line(n))
+
+
 @note.command()
 @option("--nid", required=True, help=des_notebook)
 @option("--archived", default=False, help=des_ls_arc)
@@ -124,11 +135,9 @@ def ls(
         if res is None:
             raise Exception("Data not received.")
 
-        echo("\n" + get_ls_header())
+        print_notes(res)
 
-        for n in res:
-            echo(get_ls_note_line(n))
-
+        # Message
         if m is not None:
             echo("\n" + m)
 

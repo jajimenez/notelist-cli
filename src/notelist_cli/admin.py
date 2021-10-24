@@ -91,6 +91,7 @@ def ls():
         for u in res:
             echo(get_ls_user_line(u))
 
+        # Message
         if m is not None:
             echo("\n" + m)
 
