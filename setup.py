@@ -33,5 +33,10 @@ if __name__ == "__main__":
         ],
         package_dir={
             "notelist_cli": "src/notelist_cli"
+        },
+        entry_points={
+            "console_scripts": [
+                "notelist-cli=notelist_cli:main"
+            ]
         }
     )
