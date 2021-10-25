@@ -33,3 +33,8 @@ cli.add_command(user)
 cli.add_command(notebook)
 cli.add_command(note)
 cli.add_command(search)
+
+
+def main():
+    """Run the application."""
+    cli()
