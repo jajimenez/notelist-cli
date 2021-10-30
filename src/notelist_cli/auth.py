@@ -165,7 +165,7 @@ def check_response(r: Response):
     m = data.get("message")
     t = data.get("message_type")
 
-    if r.status_code != 200:
+    if r.status_code not in (200, 201):
         if t in ("error_expired_token", "error_not_fresh_token"):
             m += ". " + login_me
 
