@@ -1,6 +1,7 @@
 """Administration module."""
 
 import sys
+from typing import Optional
 
 from click import group, option, confirmation_option, echo
 
@@ -143,7 +144,7 @@ def get(id: str):
 
 def put_user(
     method: str, endpoint: str, username: str, password: str, admin: bool,
-    enabled: bool, name: str, email: str
+    enabled: bool, name: Optional[str], email: Optional[str]
 ):
     """Put (create or update) a user.
 
@@ -163,10 +164,10 @@ def put_user(
         "enabled": enabled
     }
 
-    if name != "":
+    if name is not None:
         data["name"] = name
 
-    if email != "":
+    if email is not None:
         data["email"] = email
 
     try:
@@ -182,18 +183,18 @@ def put_user(
 
 
 @user.command()
-@option("--username", prompt=True, help=des_username)
+@option("--username", required=True, help=des_username)
 @option(
     "--password", prompt=True, confirmation_prompt=des_password_2,
     hide_input=True, help=des_password_1
 )
-@option("--admin", default=False, prompt=True, help=des_admin)
-@option("--enabled", default=False, prompt=True, help=des_enabled)
-@option("--name", default="", prompt=True, help=des_name)
-@option("--email", default="", prompt=True, help=des_email)
+@option("--admin", default=False, help=des_admin)
+@option("--enabled", default=False, help=des_enabled)
+@option("--name", help=des_name)
+@option("--email", help=des_email)
 def create(
-    username: str, password: str, admin: bool, enabled: bool, name: str,
-    email: str
+    username: str, password: str, admin: bool, enabled: bool,
+    name: Optional[str], email: Optional[str]
 ):
     """Create a user.
 
@@ -205,18 +206,19 @@ def create(
 
 
 @user.command()
-@option("--id", prompt=True, help=des_user)
-@option("--username", prompt=True, help=des_username)
+@option("--id", required=True, help=des_user)
+@option("--username", required=True, help=des_username)
 @option(
     "--password", prompt=True, confirmation_prompt=des_password_2,
-    hide_input=True, help=des_password_1)
-@option("--admin", default=False, prompt=True, help=des_admin)
-@option("--enabled", default=False, prompt=True, help=des_enabled)
-@option("--name", default="", prompt=True, help=des_name)
-@option("--email", default="", prompt=True, help=des_email)
+    hide_input=True, help=des_password_1
+)
+@option("--admin", default=False, help=des_admin)
+@option("--enabled", default=False, help=des_enabled)
+@option("--name", help=des_name)
+@option("--email", help=des_email)
 def update(
     id: str, username: str, password: str, admin: bool, enabled: bool,
-    name: str, email: str
+    name: Optional[str], email: Optional[str]
 ):
     """Update a user.
 

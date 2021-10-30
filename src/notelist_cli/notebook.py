@@ -1,6 +1,7 @@
 """Notebook module."""
 
 import sys
+from typing import Optional
 
 from click import group, option, confirmation_option, echo
 
@@ -124,7 +125,9 @@ def get(id: str):
         sys.exit(f"Error: {e}")
 
 
-def put_notebook(method: str, endpoint: str, name: str, tag_colors: str):
+def put_notebook(
+    method: str, endpoint: str, name: str, tag_colors: Optional[str]
+):
     """Put (create or update) a notebook.
 
     :param method: Request method ("POST" or "PUT").
@@ -136,7 +139,7 @@ def put_notebook(method: str, endpoint: str, name: str, tag_colors: str):
     _tag_colors = {}
 
     try:
-        if tag_colors != "":
+        if tag_colors is not None:
             col = tag_colors.replace(" ", "")
             col = tag_colors.split(",")
 
@@ -163,18 +166,18 @@ def put_notebook(method: str, endpoint: str, name: str, tag_colors: str):
 
 
 @notebook.command()
-@option("--name", prompt=True, help=des_name)
-@option("--tagcolors", default="", prompt=True, help=des_tag_colors)
-def create(name: str, tagcolors: str):
+@option("--name", required=True, help=des_name)
+@option("--tagcolors", help=des_tag_colors)
+def create(name: str, tagcolors: Optional[str]):
     """Create a notebook."""
     put_notebook("POST", notebook_ep, name, tagcolors)
 
 
 @notebook.command()
-@option("--id", prompt=True, help=des_notebook)
-@option("--name", prompt=True, help=des_name)
-@option("--tagcolors", default="", prompt=True, help=des_tag_colors)
-def update(id: str, name: str, tagcolors: str):
+@option("--id", required=True, help=des_notebook)
+@option("--name", required=True, help=des_name)
+@option("--tagcolors", help=des_tag_colors)
+def update(id: str, name: str, tagcolors: Optional[str]):
     """Update a notebook."""
     ep = f"{notebook_ep}/{id}"
     put_notebook("PUT", ep, name, tagcolors)

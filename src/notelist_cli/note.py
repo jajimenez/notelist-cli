@@ -1,6 +1,7 @@
 """Note module."""
 
 import sys
+from typing import Optional
 
 from click import group, option, confirmation_option, echo
 
@@ -106,7 +107,8 @@ def print_notes(notes: list[dict]):
 @option("--lastmod", default=True, help=des_ls_last_mod)
 @option("--asc", default=False, help=des_asc)
 def ls(
-    nid: str, archived: bool, tags: str, notags: bool, lastmod: bool, asc: bool
+    nid: str, archived: bool, tags: Optional[str], notags: bool, lastmod: bool,
+    asc: bool
 ):
     """List all the notes of a notebook that match a filter."""
     ep = f"{notes_ep}/{nid}"
@@ -208,8 +210,8 @@ def get(id: str):
 
 
 def put_note(
-    method: str, endpoint: str, notebook_id: str, archived: bool, title: str,
-    body: str, tags: str
+    method: str, endpoint: str, notebook_id: str, archived: bool,
+    title: Optional[str], body: Optional[str], tags: Optional[str]
 ):
     """Put (create or update) a note.
 
@@ -223,13 +225,13 @@ def put_note(
     """
     data = {"notebook_id": notebook_id, "archived": archived}
 
-    if title != "":
+    if title is not None:
         data["title"] = title
 
-    if body != "":
+    if body is not None:
         data["body"] = body
 
-    if tags != "":
+    if tags is not None:
         tags = tags.replace(" ", "").split(",")
         data["tags"] = tags
 
@@ -246,25 +248,29 @@ def put_note(
 
 
 @note.command()
-@option("--nid", prompt=True, help=des_notebook)
-@option("--archived", default=False, prompt=True, help=des_arc)
-@option("--title", default="", prompt=True, help=des_title)
-@option("--body", default="", prompt=True, help=des_body)
-@option("--tags", default="", prompt=True, help=des_tags)
-def create(nid: str, archived: bool, title: str, body: str, tags: str):
+@option("--nid", required=True, help=des_notebook)
+@option("--archived", default=False, help=des_arc)
+@option("--title", help=des_title)
+@option("--body", help=des_body)
+@option("--tags", help=des_tags)
+def create(
+    nid: str, archived: bool, title: Optional[str], body: Optional[str],
+    tags: Optional[str]
+):
     """Create a note."""
     put_note("POST", note_ep, nid, archived, title, body, tags)
 
 
 @note.command()
-@option("--id", prompt=True, help=des_note)
-@option("--nid", prompt=True, help=des_notebook)
-@option("--archived", default=False, prompt=True, help=des_arc)
-@option("--title", default="", prompt=True, help=des_title)
-@option("--body", default="", prompt=True, help=des_body)
-@option("--tags", default="", prompt=True, help=des_tags)
+@option("--id", required=True, help=des_note)
+@option("--nid", required=True, help=des_notebook)
+@option("--archived", default=False, help=des_arc)
+@option("--title", help=des_title)
+@option("--body", help=des_body)
+@option("--tags", help=des_tags)
 def update(
-    id: str, nid: str, archived: bool, title: str, body: str, tags: str
+    id: str, nid: str, archived: bool, title: Optional[str],
+    body: Optional[str], tags: Optional[str]
 ):
     """Update a note."""
     ep = f"{note_ep}/{id}"

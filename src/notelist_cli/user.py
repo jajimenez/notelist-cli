@@ -1,6 +1,7 @@
 """User module."""
 
 import sys
+from typing import Optional
 
 from click import group, option, echo
 
@@ -68,20 +69,21 @@ def get():
 @user.command()
 @option(
     "--password", prompt=True, confirmation_prompt=des_password_2,
-    hide_input=True, help=des_password_1)
-@option("--name", default="", prompt=True, help=des_name)
-@option("--email", default="", prompt=True, help=des_email)
-def update(password: str, name: str, email: str):
+    hide_input=True, help=des_password_1
+)
+@option("--name", help=des_name)
+@option("--email", help=des_email)
+def update(password: str, name: Optional[str], email: Optional[str]):
     """Update user.
 
     If the "--password" parameter is not set, its value is prompted and hidden.
     """
     data = {"password": password}
 
-    if name != "":
+    if name is not None:
         data["name"] = name
 
-    if email != "":
+    if email is not None:
         data["email"] = email
 
     try:
