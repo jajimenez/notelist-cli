@@ -129,22 +129,20 @@ def ls(
         check_response(r)
 
         d = r.json()
-        res = d.get("result")
-        m = d.get("message")
+        notes = d.get("result")
 
-        if res is None:
+        if notes is None:
             raise Exception("Data not received.")
 
-        print_notes(res)
+        c = len(notes)
 
-        # Message
-        if m is not None:
-            echo("\n" + m)
+        if c > 0:
+            print_notes(notes)
 
-        echo()
+        s = "s" if c != 1 else ""
+        echo(f"\n{c} note{s}\n")
     except Exception as e:
-        echo(f"Error: {e}")
-        sys.exit(1)
+        sys.exit(f"Error: {e}")
 
 
 @note.command()
@@ -206,8 +204,7 @@ def get(id: str):
 
         echo()
     except Exception as e:
-        echo(f"Error: {e}")
-        sys.exit(1)
+        sys.exit(f"Error: {e}")
 
 
 def put_note(
@@ -245,8 +242,7 @@ def put_note(
         if m is not None:
             echo(m)
     except Exception as e:
-        echo(f"Error: {e}")
-        sys.exit(1)
+        sys.exit(f"Error: {e}")
 
 
 @note.command()
@@ -290,5 +286,4 @@ def delete(id: str):
         if m is not None:
             echo(m)
     except Exception as e:
-        echo(f"Error: {e}")
-        sys.exit(1)
+        sys.exit(f"Error: {e}")

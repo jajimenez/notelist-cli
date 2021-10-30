@@ -70,22 +70,20 @@ def ls():
         check_response(r)
 
         d = r.json()
-        res = d.get("result")
-        m = d.get("message")
+        notebooks = d.get("result")
 
-        if res is None:
+        if notebooks is None:
             raise Exception("Data not received.")
 
-        print_notebooks(res)
+        c = len(notebooks)
 
-        # Message
-        if m is not None:
-            echo("\n" + m)
+        if c > 0:
+            print_notebooks(notebooks)
 
-        echo()
+        s = "s" if c != 1 else ""
+        echo(f"\n{c} notebook{s}\n")
     except Exception as e:
-        echo(f"Error: {e}")
-        sys.exit(1)
+        sys.exit(f"Error: {e}")
 
 
 @notebook.command()
@@ -123,8 +121,7 @@ def get(id: str):
         echo("Created:" + (" " * 7) + created)
         echo(f"Last modified: {last_mod}\n")
     except Exception as e:
-        echo(f"Error: {e}")
-        sys.exit(1)
+        sys.exit(f"Error: {e}")
 
 
 def put_notebook(method: str, endpoint: str, name: str, tag_colors: str):
@@ -148,8 +145,7 @@ def put_notebook(method: str, endpoint: str, name: str, tag_colors: str):
                 _tag_colors[tag] = color
 
     except Exception as e:
-        echo(f'Error: "tag_colors" is invalid.')
-        sys.exit(1)
+        sys.exit(f'Error: "tag_colors" is invalid.')
 
     if len(_tag_colors) > 0:
         data["tag_colors"] = _tag_colors
@@ -163,8 +159,7 @@ def put_notebook(method: str, endpoint: str, name: str, tag_colors: str):
         if m is not None:
             echo(m)
     except Exception as e:
-        echo(f"Error: {e}")
-        sys.exit(1)
+        sys.exit(f"Error: {e}")
 
 
 @notebook.command()
@@ -200,5 +195,4 @@ def delete(id: str):
         if m is not None:
             echo(m)
     except Exception as e:
-        echo(f"Error: {e}")
-        sys.exit(1)
+        sys.exit(f"Error: {e}")

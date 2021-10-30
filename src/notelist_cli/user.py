@@ -62,8 +62,7 @@ def get():
         echo("Created:" + (" " * 7) + created)
         echo(f"Last modified: {last_mod}\n")
     except Exception as e:
-        echo(f"Error: {e}")
-        sys.exit(1)
+        sys.exit(f"Error: {e}")
 
 
 @user.command()
@@ -116,5 +115,4 @@ def update(password: str, name: str, email: str):
         if m is not None:
             echo(m)
     except Exception as e:
-        echo(f"Error: {e}")
-        sys.exit(1)
+        sys.exit(f"Error: {e}")

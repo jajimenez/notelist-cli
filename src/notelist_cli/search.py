@@ -27,7 +27,6 @@ def search(s: str):
 
         d = r.json()
         res = d.get("result")
-        m = d.get("message")
 
         if res is None:
             raise Exception("Data not received.")
@@ -36,19 +35,26 @@ def search(s: str):
         notebooks = res["notebooks"]
         notes = res["notes"]
 
-        if len(notebooks) > 0:
-            print("\n" + "Notebooks:")
+        # Print notebooks found
+        c = len(notebooks)
+        s1 = "s" if c != 1 else ""
+        s2 = ":" if c > 0 else ""
+
+        echo(f"\n{c} notebook{s1} found{s2}")
+
+        if c > 0:
             print_notebooks(notebooks)
 
-        if len(notes) > 0:
-            print("\n" + "Notes:")
-            print_notes(notes)
+        # Print notes found
+        c = len(notes)
+        s1 = "s" if c != 1 else ""
+        s2 = ":" if c > 0 else ""
 
-        # Message
-        if m is not None:
-            echo("\n" + m)
+        echo(f"\n{c} note{s1} found{s2}")
+
+        if c > 0:
+            print_notes(notes)
 
         echo()
     except Exception as e:
-        echo(f"Error: {e}")
-        sys.exit(1)
+        sys.exit(f"Error: {e}")

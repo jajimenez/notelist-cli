@@ -74,31 +74,29 @@ def user():
 
 @user.command()
 def ls():
-    """List all the users."""
+    """List users."""
     try:
         r = request("GET", users_ep, True)
         check_response(r)
 
         d = r.json()
-        res = d.get("result")
-        m = d.get("message")
+        users = d.get("result")
 
-        if res is None:
+        if users is None:
             raise Exception("Data not received.")
 
-        echo("\n" + get_ls_header())
+        c = len(users)
 
-        for u in res:
-            echo(get_ls_user_line(u))
+        if c > 0:
+            echo("\n" + get_ls_header())
 
-        # Message
-        if m is not None:
-            echo("\n" + m)
+            for u in users:
+                echo(get_ls_user_line(u))
 
-        echo()
+        s = "s" if c != 1 else ""
+        echo(f"\n{c} user{s}\n")
     except Exception as e:
-        echo(f"Error: {e}")
-        sys.exit(1)
+        sys.exit(f"Error: {e}")
 
 
 @user.command()
@@ -126,22 +124,21 @@ def get(id: str):
         created = res["created"].replace("T", " ")
         last_mod = res["last_modified"].replace("T", " ")
 
-        print("\nID:" + (" " * 12) + _id)
-        print("Username: " + (" " * 5) + username)
-        print(f"Administrator: {admin}")
-        print("Enabled:" + (" " * 7) + enabled)
+        echo("\nID:" + (" " * 12) + _id)
+        echo("Username: " + (" " * 5) + username)
+        echo(f"Administrator: {admin}")
+        echo("Enabled:" + (" " * 7) + enabled)
 
         if name is not None:
-            print("Name:" + (" " * 10) + name)
+            echo("Name:" + (" " * 10) + name)
 
         if email is not None:
-            print("E-mail:" + (" " * 8) + email)
+            echo("E-mail:" + (" " * 8) + email)
 
         echo("Created:" + (" " * 7) + created)
         echo(f"Last modified: {last_mod}\n")
     except Exception as e:
-        echo(f"Error: {e}")
-        sys.exit(1)
+        sys.exit(f"Error: {e}")
 
 
 def put_user(
@@ -181,8 +178,7 @@ def put_user(
         if m is not None:
             echo(m)
     except Exception as e:
-        echo(f"Error: {e}")
-        sys.exit(1)
+        sys.exit(f"Error: {e}")
 
 
 @user.command()
@@ -251,5 +247,4 @@ def delete(id: str):
         if m is not None:
             echo(m)
     except Exception as e:
-        echo(f"Error: {e}")
-        sys.exit(1)
+        sys.exit(f"Error: {e}")

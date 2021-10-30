@@ -169,8 +169,7 @@ def check_response(r: Response):
         if t in ("error_expired_token", "error_not_fresh_token"):
             m += ". " + login_me
 
-        echo(m)
-        sys.exit(1)
+        raise Exception(m)
 
 
 @group()
@@ -205,8 +204,7 @@ def login(username: str, password: str):
         if m is not None:
             echo(m)
     except Exception as e:
-        echo(f"Error: {e}")
-        sys.exit(1)
+        sys.exit(f"Error: {e}")
 
 
 @auth.command()
@@ -231,5 +229,4 @@ def logout():
         if m is not None:
             echo(m)
     except Exception as e:
-        echo(f"Error: {e}")
-        sys.exit(1)
+        sys.exit(f"Error: {e}")
