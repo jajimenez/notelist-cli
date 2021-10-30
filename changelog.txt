@@ -1,6 +1,7 @@
 0.2.0 - 30 Oct 2021
 -------------------
 - Commands output improved
+- Response fix
 
 0.1.0 - 25 Oct 2021
 -------------------
