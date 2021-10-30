@@ -14,12 +14,12 @@ from notelist_cli.note import note
 from notelist_cli.search import search
 
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 
 @group()
 def cli():
-    """Welcome to Notelist CLI 0.1.0.
+    """Welcome to Notelist CLI 0.2.0.
 
     Notelist CLI is a command line interface for the Notelist API.
     """
