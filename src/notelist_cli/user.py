@@ -66,19 +66,20 @@ def get():
         sys.exit(f"Error: {e}")
 
 
-@user.command()
-@option(
-    "--password", prompt=True, confirmation_prompt=des_password_2,
-    hide_input=True, help=des_password_1
-)
-@option("--name", help=des_name)
-@option("--email", help=des_email)
-def update(password: str, name: Optional[str], email: Optional[str]):
-    """Update user.
+def put_user(
+    password: Optional[str] = None, name: Optional[str] = None,
+    email: Optional[str] = None
+):
+    """Put/update a user.
 
-    If the "--password" parameter is not set, its value is prompted and hidden.
+    :param password: Password.
+    :param name: Name.
+    :param email: E-mail.
     """
-    data = {"password": password}
+    data = {}
+
+    if name is not None:
+        data["password"] = password
 
     if name is not None:
         data["name"] = name
@@ -87,9 +88,10 @@ def update(password: str, name: Optional[str], email: Optional[str]):
         data["email"] = email
 
     try:
-        # Get current data. If the current user is an administrator, we need to
-        # send the current values of the "username", "admin" and "enabled"
-        # fields to avoid a validation error.
+        if len(data) == 0:
+            raise Exception("No options specified. At least one is required.")
+
+        # Get current data
         _id = get_user_id()
         ep = f"{user_ep}/{_id}"
 
@@ -100,13 +102,19 @@ def update(password: str, name: Optional[str], email: Optional[str]):
         if user is None:
             raise Exception("Data not received.")
 
-        k1 = "username"
-        k2 = "admin"
-        k3 = "enabled"
+        # Get the fields that won't be updated except the password. For the API
+        # update request, all fields except the password are required. The
+        # password is optional.
+        for k in ("name", "email"):
+            if k not in data:
+                data[k] = user[k]
 
-        # Check if the user is an administrator
-        if user[k2]:
-            data = data | {k1: user[k1], k2: user[k2], k3: user[k3]}
+        # Check if the user is an administrator. If the current user is an
+        # administrator, we need to get the current values of the "username",
+        # "admin" and "enabled" fields to avoid a validation error.
+        if user["admin"]:
+            for k in ("username", "admin", "enabled"):
+                data[k] = user[k]
 
         # Update user
         r = request("PUT", ep, True, data)
@@ -118,3 +126,25 @@ def update(password: str, name: Optional[str], email: Optional[str]):
             echo(m)
     except Exception as e:
         sys.exit(f"Error: {e}")
+
+
+@user.command()
+@option(
+    "--password", prompt=True, confirmation_prompt=des_password_2,
+    hide_input=True, help=des_password_1
+)
+@option("--name", help=des_name)
+@option("--email", help=des_email)
+def update(name: Optional[str], email: Optional[str]):
+    """Update user."""
+    put_user(name=name, email=email)
+
+
+@user.command()
+@option(
+    "--password", prompt=True, confirmation_prompt=des_password_2,
+    hide_input=True, help=des_password_1
+)
+def updatepw(password: str):
+    """Update user password."""
+    put_user(password=password)
