@@ -126,28 +126,21 @@ def get(id: str):
         sys.exit(f"Error: {e}")
 
 
-def put_notebook(
-    method: str, endpoint: str, name: str, tag_colors: Optional[str]
-):
-    """Put (create or update) a notebook.
-
-    :param method: Request method ("POST" or "PUT").
-    :param endpoint: Request endpoint.
-    :param name: Name.
-    :param tag_colors: Tag colors. E.g. "tag1=color1, tag2=color2".
-    """
+@notebook.command()
+@option("--name", required=True, help=des_name)
+@option("--tagcolors", help=des_tag_colors)
+def create(name: str, tagcolors: Optional[str]):
+    """Create a notebook."""
     data = {"name": name}
     _tag_colors = {}
 
     try:
-        if tag_colors is not None:
-            col = tag_colors.replace(" ", "")
-            col = tag_colors.split(",")
+        if tagcolors is not None:
+            col = tagcolors.replace(" ", "").split(",")
 
             for c in col:
                 tag, color = c.split("=")
                 _tag_colors[tag] = color
-
     except Exception as e:
         sys.exit(f'Error: "tag_colors" is invalid.')
 
@@ -155,7 +148,7 @@ def put_notebook(
         data["tag_colors"] = _tag_colors
 
     try:
-        r = request(method, endpoint, True, data)
+        r = request("POST", notebook_ep, True, data)
         check_response(r)
 
         m = r.json().get("message")
@@ -167,21 +160,61 @@ def put_notebook(
 
 
 @notebook.command()
-@option("--name", required=True, help=des_name)
-@option("--tagcolors", help=des_tag_colors)
-def create(name: str, tagcolors: Optional[str]):
-    """Create a notebook."""
-    put_notebook("POST", notebook_ep, name, tagcolors)
-
-
-@notebook.command()
 @option("--id", required=True, help=des_notebook)
-@option("--name", required=True, help=des_name)
+@option("--name", help=des_name)
 @option("--tagcolors", help=des_tag_colors)
-def update(id: str, name: str, tagcolors: Optional[str]):
+def update(id: str, name: Optional[str], tagcolors: Optional[str]):
     """Update a notebook."""
-    ep = f"{notebook_ep}/{id}"
-    put_notebook("PUT", ep, name, tagcolors)
+    data = {}
+
+    if name is not None:
+        data["name"] = name
+
+    _tag_colors = {}
+
+    try:
+        if tagcolors is not None:
+            col = tagcolors.replace(" ", "").split(",")
+
+            for c in col:
+                tag, color = c.split("=")
+                _tag_colors[tag] = color
+    except Exception as e:
+        sys.exit(f'Error: "tag_colors" is invalid.')
+
+    if len(_tag_colors) > 0:
+        data["tag_colors"] = _tag_colors
+
+    try:
+        if len(data) == 0:
+            raise Exception("No options specified. At least one is required.")
+
+        # Get current data
+        ep = f"{notebook_ep}/{id}"
+
+        r = request("GET", ep, True)
+        check_response(r)
+        notebook = r.json().get("result")
+
+        if notebook is None:
+            raise Exception("Data not received.")
+
+        # Get the fields that won't be updated. For the API update request, the
+        # name field is required.
+        for k in ("name", "tag_colors"):
+            if k not in data and k in notebook:
+                data[k] = notebook[k]
+
+        # Update notebook
+        r = request("PUT", ep, True, data)
+        check_response(r)
+
+        m = r.json().get("message")
+
+        if m is not None:
+            echo(m)
+    except Exception as e:
+        sys.exit(f"Error: {e}")
 
 
 @notebook.command()
