@@ -9,7 +9,7 @@ if __name__ == "__main__":
 
     st.setup(
         name="notelist-cli",
-        version="0.2.1",
+        version="0.3.0",
         description="Command line interface for the Notelist API",
         author="Jose A. Jimenez",
         author_email="jajimenezcarm@gmail.com",
