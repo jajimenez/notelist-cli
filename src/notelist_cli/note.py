@@ -205,21 +205,21 @@ def get(id: str):
         sys.exit(f"Error: {e}")
 
 
-def put_note(
-    method: str, endpoint: str, notebook_id: str, archived: bool,
-    title: Optional[str], body: Optional[str], tags: Optional[str]
+@note.command()
+@option("--nid", required=True, help=des_notebook)
+@option("--archived", type=bool, help=des_arc)
+@option("--title", help=des_title)
+@option("--body", help=des_body)
+@option("--tags", help=des_tags)
+def create(
+    nid: str, archived: bool, title: Optional[str], body: Optional[str],
+    tags: Optional[str]
 ):
-    """Put (create or update) a note.
+    """Create a note."""
+    data = {"notebook_id": nid}
 
-    :param method: Request method ("POST" or "PUT").
-    :param endpoint: Request endpoint.
-    :param notebook_id: Notebook ID.
-    :param archived: Whether the note is archived or not.
-    :param title: Title.
-    :param body: Body.
-    :param tags: Comma separated tags. E.g. "tag1,tag2".
-    """
-    data = {"notebook_id": notebook_id, "archived": archived}
+    if archived is not None:
+        data["archived"] = archived
 
     if title is not None:
         data["title"] = title
@@ -232,7 +232,7 @@ def put_note(
         data["tags"] = tags
 
     try:
-        r = request(method, endpoint, True, data)
+        r = request("POST", note_ep, True, data)
         check_response(r)
 
         m = r.json().get("message")
@@ -244,33 +244,65 @@ def put_note(
 
 
 @note.command()
-@option("--nid", required=True, help=des_notebook)
-@option("--archived", default=False, help=des_arc)
-@option("--title", help=des_title)
-@option("--body", help=des_body)
-@option("--tags", help=des_tags)
-def create(
-    nid: str, archived: bool, title: Optional[str], body: Optional[str],
-    tags: Optional[str]
-):
-    """Create a note."""
-    put_note("POST", note_ep, nid, archived, title, body, tags)
-
-
-@note.command()
 @option("--id", required=True, help=des_note)
-@option("--nid", required=True, help=des_notebook)
-@option("--archived", default=False, help=des_arc)
+@option("--nid", help=des_notebook)
+@option("--archived", type=bool, help=des_arc)
 @option("--title", help=des_title)
 @option("--body", help=des_body)
 @option("--tags", help=des_tags)
 def update(
-    id: str, nid: str, archived: bool, title: Optional[str],
+    id: str, nid: str, archived: Optional[bool], title: Optional[str],
     body: Optional[str], tags: Optional[str]
 ):
     """Update a note."""
-    ep = f"{note_ep}/{id}"
-    put_note("PUT", ep, nid, archived, title, body, tags)
+    data = {}
+
+    if nid is not None:
+        data["notebook_id"] = nid
+
+    if archived is not None:
+        data["archived"] = archived
+
+    if title is not None:
+        data["title"] = title
+
+    if body is not None:
+        data["body"] = body
+
+    if tags is not None:
+        tags = tags.replace(" ", "").split(",")
+        data["tags"] = tags
+
+    try:
+        if len(data) == 0:
+            raise Exception("No options specified. At least one is required.")
+
+        # Get current data
+        ep = f"{note_ep}/{id}"
+
+        r = request("GET", ep, True)
+        check_response(r)
+        note = r.json().get("result")
+
+        if note is None:
+            raise Exception("Data not received.")
+
+        # Get the fields that won't be updated. For the API update request, all
+        # fields are required.
+        for k in ("notebook_id", "archived", "title", "body", "tags"):
+            if k not in data and k in note:
+                data[k] = note[k]
+
+        # Update note
+        r = request("PUT", ep, True, data)
+        check_response(r)
+
+        m = r.json().get("message")
+
+        if m is not None:
+            echo(m)
+    except Exception as e:
+        sys.exit(f"Error: {e}")
 
 
 @note.command()
