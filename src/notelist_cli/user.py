@@ -78,7 +78,7 @@ def put_user(
     """
     data = {}
 
-    if name is not None:
+    if password is not None:
         data["password"] = password
 
     if name is not None:
