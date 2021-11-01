@@ -159,12 +159,7 @@ def create(
     username: str, password: str, admin: bool, enabled: bool,
     name: Optional[str], email: Optional[str]
 ):
-    """Create a user.
-
-    The "--name" and "--email" parameters are optional and their default value
-    is "False". If the "--password" parameter is not set, its value is prompted
-    and hidden.
-    """
+    """Create a user."""
     data = {
         "username": username,
         "password": password,
