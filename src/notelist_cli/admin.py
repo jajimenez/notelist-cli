@@ -242,7 +242,9 @@ def put_user(
         # update request, all fields except the password are required. The
         # password is optional.
         for k in ("username", "admin", "enabled", "name", "email"):
-            if k not in data and k in user:
+            if k in data and data[k] == "":
+                data.pop(k)
+            elif k not in data and k in user:
                 data[k] = user[k]
 
         # Update user

@@ -199,10 +199,11 @@ def update(id: str, name: Optional[str], tagcolors: Optional[str]):
         if notebook is None:
             raise Exception("Data not received.")
 
-        # Get the fields that won't be updated. For the API update request, the
-        # name field is required.
+        # Prepare new data
         for k in ("name", "tag_colors"):
-            if k not in data and k in notebook:
+            if k in data and data[k] == "":
+                data.pop(k)
+            elif k not in data and k in notebook:
                 data[k] = notebook[k]
 
         # Update notebook

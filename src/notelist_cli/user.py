@@ -70,7 +70,7 @@ def put_user(
     password: Optional[str] = None, name: Optional[str] = None,
     email: Optional[str] = None
 ):
-    """Put/update a user.
+    """Update a user.
 
     :param password: Password.
     :param name: Name.
@@ -102,16 +102,16 @@ def put_user(
         if user is None:
             raise Exception("Data not received.")
 
-        # Get the fields that won't be updated except the password. For the API
-        # update request, all fields except the password are required. The
-        # password is optional.
+        # Prepare new data
         for k in ("name", "email"):
-            if k not in data and k in user:
+            if k in data and data[k] == "":
+                data.pop(k)
+            elif k not in data and k in user:
                 data[k] = user[k]
 
-        # Check if the user is an administrator. If the current user is an
-        # administrator, we need to get the current values of the "username",
-        # "admin" and "enabled" fields to avoid a validation error.
+        # If the current user is an administrator, we need to add the current
+        # values of the "username", "admin" and "enabled" fields to the new
+        # data to avoid a validation error.
         if user["admin"]:
             for k in ("username", "admin", "enabled"):
                 data[k] = user[k]
@@ -128,6 +128,7 @@ def put_user(
         sys.exit(f"Error: {e}")
 
 
+@user.command()
 @option("--name", help=des_name)
 @option("--email", help=des_email)
 def update(name: Optional[str], email: Optional[str]):

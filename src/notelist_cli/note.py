@@ -290,7 +290,9 @@ def update(
         # Get the fields that won't be updated. For the API update request, all
         # fields are required.
         for k in ("notebook_id", "archived", "title", "body", "tags"):
-            if k not in data and k in note:
+            if k in data and data[k] == "":
+                data.pop(k)
+            elif k not in data and k in note:
                 data[k] = note[k]
 
         # Update note
