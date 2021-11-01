@@ -151,21 +151,25 @@ def get(id: str):
     "--password", prompt=True, confirmation_prompt=des_password_2,
     hide_input=True, help=des_password_1
 )
-@option("--admin", default=False, help=des_admin)
-@option("--enabled", default=False, help=des_enabled)
+@option("--admin", type=bool, help=des_admin)
+@option("--enabled", type=bool, help=des_enabled)
 @option("--name", help=des_name)
 @option("--email", help=des_email)
 def create(
-    username: str, password: str, admin: bool, enabled: bool,
-    name: Optional[str], email: Optional[str]
+    username: str, password: str, admin: Optional[bool],
+    enabled: Optional[bool], name: Optional[str], email: Optional[str]
 ):
     """Create a user."""
     data = {
         "username": username,
-        "password": password,
-        "admin": admin,
-        "enabled": enabled,
+        "password": password
     }
+
+    if admin is not None:
+        data["admin"] = admin
+
+    if enabled is not None:
+        data["enabled"] = enabled
 
     if name is not None:
         data["name"] = name
@@ -256,8 +260,8 @@ def put_user(
 @user.command()
 @option("--id", required=True, help=des_user)
 @option("--username", help=des_username)
-@option("--admin", help=des_admin)
-@option("--enabled", help=des_enabled)
+@option("--admin", type=bool, help=des_admin)
+@option("--enabled", type=bool, help=des_enabled)
 @option("--name", help=des_name)
 @option("--email", help=des_email)
 def update(
