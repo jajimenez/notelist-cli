@@ -8,6 +8,7 @@ Python.
 - Author: Jose A. Jimenez (jajimenezcarm@gmail.com)
 - License: MIT License
 - Repository: https://github.com/jajimenez/notelist-cli
+- Notelist API repository: https://github.com/jajimenez/notelist
 
 ## How to install
 
@@ -18,16 +19,7 @@ You can download and install Notelist CLI from the **PyPI** repository with
 pip install notelist
 ```
 
-## How to build
-
-To generate the **built package** and the **source archive**, run the following commands (the *wheel* Python package is required for generating the built
-package):
-
-```bash
-python setup.py bdist_wheel sdist
-```
-
-## How to use
+## How to run
 
 Once Notelist CLI is installed, run the `notelist-cli` or `notelist-cli --help` 
 command to see the help information:
@@ -70,4 +62,13 @@ To log out, run the following command:
 
 ```bash
 notelist-cli auth logout
+```
+
+## How to build
+
+To generate the **built package** and the **source archive**, run the following commands (the *wheel* Python package is required for generating the built
+package):
+
+```bash
+python setup.py bdist_wheel sdist
 ```
