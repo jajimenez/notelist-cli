@@ -106,7 +106,7 @@ def put_user(
         # update request, all fields except the password are required. The
         # password is optional.
         for k in ("name", "email"):
-            if k not in data:
+            if k not in data and k in user:
                 data[k] = user[k]
 
         # Check if the user is an administrator. If the current user is an
@@ -128,11 +128,6 @@ def put_user(
         sys.exit(f"Error: {e}")
 
 
-@user.command()
-@option(
-    "--password", prompt=True, confirmation_prompt=des_password_2,
-    hide_input=True, help=des_password_1
-)
 @option("--name", help=des_name)
 @option("--email", help=des_email)
 def update(name: Optional[str], email: Optional[str]):
