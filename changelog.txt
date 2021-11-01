@@ -1,5 +1,6 @@
-0.2.1 - 01 Nov 2021
+0.3.0 - 01 Nov 2021
 -------------------
+- Update commands improved
 - Commands output improved
 
 0.2.0 - 30 Oct 2021
