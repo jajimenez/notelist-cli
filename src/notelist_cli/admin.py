@@ -145,46 +145,6 @@ def get(id: str):
         sys.exit(f"Error: {e}")
 
 
-def put_user(
-    method: str, endpoint: str, username: str, password: str, admin: bool,
-    enabled: bool, name: Optional[str], email: Optional[str]
-):
-    """Put (create or update) a user.
-
-    :param method: Request method ("POST" or "PUT").
-    :param endpoint: Request endpoint.
-    :param username: Username.
-    :param password: Password.
-    :param admin: Whether the user is an administrator or not.
-    :param enabled: Whether the user is enabled or not.
-    :param name: Name.
-    :param email: E-mail.
-    """
-    data = {
-        "username": username,
-        "password": password,
-        "admin": admin,
-        "enabled": enabled
-    }
-
-    if name is not None:
-        data["name"] = name
-
-    if email is not None:
-        data["email"] = email
-
-    try:
-        r = request(method, endpoint, True, data)
-        check_response(r)
-
-        m = r.json().get("message")
-
-        if m is not None:
-            echo(m)
-    except Exception as e:
-        sys.exit(f"Error: {e}")
-
-
 @user.command()
 @option("--username", required=True, help=des_username)
 @option(
@@ -205,36 +165,125 @@ def create(
     is "False". If the "--password" parameter is not set, its value is prompted
     and hidden.
     """
-    put_user("POST", user_ep, username, password, admin, enabled, name, email)
+    data = {
+        "username": username,
+        "password": password,
+        "admin": admin,
+        "enabled": enabled,
+    }
+
+    if name is not None:
+        data["name"] = name
+
+    if email is not None:
+        data["email"] = email
+
+    try:
+        r = request("POST", user_ep, True, data)
+        check_response(r)
+
+        m = r.json().get("message")
+
+        if m is not None:
+            echo(m)
+    except Exception as e:
+        sys.exit(f"Error: {e}")
+
+
+def put_user(
+    _id: str, username: Optional[str] = None, password: Optional[str] = None,
+    admin: Optional[bool] = None, enabled: Optional[bool] = None,
+    name: Optional[str] = None, email: Optional[str] = None
+):
+    """Put/update a user.
+
+    :param _id: User ID.
+    :param username: Username.
+    :param password: Password.
+    :param admin: Whether the user is an administrator or not.
+    :param enabled: Whether the user is enabled or not.
+    :param name: Name.
+    :param email: E-mail.
+    """
+    data = {}
+
+    if username is not None:
+        data["username"] = username
+
+    if password is not None:
+        data["password"] = password
+
+    if admin is not None:
+        data["admin"] = admin
+
+    if enabled is not None:
+        data["enabled"] = enabled
+
+    if name is not None:
+        data["name"] = name
+
+    if email is not None:
+        data["email"] = email
+
+    try:
+        if len(data) == 0:
+            raise Exception("No options specified. At least one is required.")
+
+        # Get current data
+        ep = f"{user_ep}/{_id}"
+
+        r = request("GET", ep, True)
+        check_response(r)
+        user = r.json().get("result")
+
+        if user is None:
+            raise Exception("Data not received.")
+
+        # Get the fields that won't be updated except the password. For the API
+        # update request, all fields except the password are required. The
+        # password is optional.
+        for k in ("username", "admin", "enabled", "name", "email"):
+            if k not in data and k in user:
+                data[k] = user[k]
+
+        # Update user
+        r = request("PUT", ep, True, data)
+        check_response(r)
+
+        m = r.json().get("message")
+
+        if m is not None:
+            echo(m)
+    except Exception as e:
+        sys.exit(f"Error: {e}")
 
 
 @user.command()
 @option("--id", required=True, help=des_user)
-@option("--username", required=True, help=des_username)
+@option("--username", help=des_username)
+@option("--admin", help=des_admin)
+@option("--enabled", help=des_enabled)
+@option("--name", help=des_name)
+@option("--email", help=des_email)
+def update(
+    id: str, username: Optional[str], admin: Optional[bool],
+    enabled: Optional[bool], name: Optional[str], email: Optional[str]
+):
+    """Update a user."""
+    put_user(
+        id, username=username, admin=admin, enabled=enabled, name=name,
+        email=email
+    )
+
+
+@user.command()
 @option(
     "--password", prompt=True, confirmation_prompt=des_password_2,
     hide_input=True, help=des_password_1
 )
-@option("--admin", default=False, help=des_admin)
-@option("--enabled", default=False, help=des_enabled)
-@option("--name", help=des_name)
-@option("--email", help=des_email)
-def update(
-    id: str, username: str, password: str, admin: bool, enabled: bool,
-    name: Optional[str], email: Optional[str]
-):
-    """Update a user.
-
-    The current user, if it's not an administrator, can update only its own
-    data and cannot update the "--username", "--admin" and "--enabled"
-    parameters.
-
-    The "--name" and "--email" parameters are optional and their default value
-    is "False". If the "--password" parameter is not set, its value is prompted
-    and hidden.
-    """
-    ep = f"{user_ep}/{id}"
-    put_user("PUT", ep, username, password, admin, enabled, name, email)
+def updatepw(password: str):
+    """Update a user password."""
+    put_user(password=password)
 
 
 @user.command()
