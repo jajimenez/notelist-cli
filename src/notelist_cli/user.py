@@ -49,7 +49,7 @@ def get():
         created = res["created"].replace("T", " ")
         last_mod = res["last_modified"].replace("T", " ")
 
-        echo("\nID:" + (" " * 12) + _id)
+        echo("ID:" + (" " * 12) + _id)
         echo("Username: " + (" " * 5) + username)
         echo(f"Administrator: {admin}")
         echo("Enabled:" + (" " * 7) + enabled)
@@ -61,7 +61,7 @@ def get():
             echo("E-mail:" + (" " * 8) + email)
 
         echo("Created:" + (" " * 7) + created)
-        echo(f"Last modified: {last_mod}\n")
+        echo(f"Last modified: {last_mod}")
     except Exception as e:
         sys.exit(f"Error: {e}")
 

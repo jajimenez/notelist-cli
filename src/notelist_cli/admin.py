@@ -33,7 +33,8 @@ def get_ls_header() -> str:
     """
     return (
         "ID" + (" " * 31) + "| Username" + (" " * 13) + "| Administrator | "
-        "Enabled |\n")
+        "Enabled\n"
+    )
 
 
 def get_ls_user_line(user: dict) -> str:
@@ -56,7 +57,7 @@ def get_ls_user_line(user: dict) -> str:
 
     line += username + " | "
     line += admin + (" " * 11) + "| "
-    line += enabled + (" " * 5) + "|"
+    line += enabled
 
     return line
 
@@ -89,13 +90,15 @@ def ls():
         c = len(users)
 
         if c > 0:
-            echo("\n" + get_ls_header())
+            echo(get_ls_header())
 
             for u in users:
                 echo(get_ls_user_line(u))
 
+            echo()
+
         s = "s" if c != 1 else ""
-        echo(f"\n{c} user{s}\n")
+        echo(f"{c} user{s}")
     except Exception as e:
         sys.exit(f"Error: {e}")
 
@@ -125,7 +128,7 @@ def get(id: str):
         created = res["created"].replace("T", " ")
         last_mod = res["last_modified"].replace("T", " ")
 
-        echo("\nID:" + (" " * 12) + _id)
+        echo("ID:" + (" " * 12) + _id)
         echo("Username: " + (" " * 5) + username)
         echo(f"Administrator: {admin}")
         echo("Enabled:" + (" " * 7) + enabled)
@@ -137,7 +140,7 @@ def get(id: str):
             echo("E-mail:" + (" " * 8) + email)
 
         echo("Created:" + (" " * 7) + created)
-        echo(f"Last modified: {last_mod}\n")
+        echo(f"Last modified: {last_mod}")
     except Exception as e:
         sys.exit(f"Error: {e}")
 

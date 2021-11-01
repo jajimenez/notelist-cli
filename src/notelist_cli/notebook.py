@@ -39,8 +39,8 @@ def get_ls_notebook_line(notebook: dict) -> str:
     name = notebook.get("name")
     c = len(name)
 
-    if c > 20:
-        name = f"{name[:17]}..."
+    if c > 40:
+        name = f"{name[:37]}..."
 
     line += name
     return line
@@ -57,7 +57,7 @@ def print_notebooks(notebooks: list[dict]):
 
     :param notebooks: Notebooks.
     """
-    echo("\n" + get_ls_header())
+    echo(get_ls_header())
 
     for n in notebooks:
         echo(get_ls_notebook_line(n))
@@ -80,9 +80,10 @@ def ls():
 
         if c > 0:
             print_notebooks(notebooks)
+            echo()
 
         s = "s" if c != 1 else ""
-        echo(f"\n{c} notebook{s}\n")
+        echo(f"{c} notebook{s}")
     except Exception as e:
         sys.exit(f"Error: {e}")
 
@@ -113,14 +114,14 @@ def get(id: str):
             tag_colors = [f"{i}={v}" for i, v in tag_colors.items()]
             tag_colors = ", ".join(tag_colors)
 
-        echo("\nID:" + (" " * 12) + _id)
+        echo("ID:" + (" " * 12) + _id)
         echo(f"Name:" + (" " * 10) + name)
 
         if tag_colors is not None:
             echo(f"Tag colors:" + (" " * 4) + tag_colors)
 
         echo("Created:" + (" " * 7) + created)
-        echo(f"Last modified: {last_mod}\n")
+        echo(f"Last modified: {last_mod}")
     except Exception as e:
         sys.exit(f"Error: {e}")
 

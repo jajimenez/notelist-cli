@@ -40,21 +40,22 @@ def search(s: str):
         s1 = "s" if c != 1 else ""
         s2 = ":" if c > 0 else ""
 
-        echo(f"\n{c} notebook{s1} found{s2}")
+        echo(f"{c} notebook{s1} found{s2}")
 
         if c > 0:
+            echo()
             print_notebooks(notebooks)
+            echo()
 
         # Print notes found
         c = len(notes)
         s1 = "s" if c != 1 else ""
         s2 = ":" if c > 0 else ""
 
-        echo(f"\n{c} note{s1} found{s2}")
+        echo(f"{c} note{s1} found{s2}")
 
         if c > 0:
+            echo()
             print_notes(notes)
-
-        echo()
     except Exception as e:
         sys.exit(f"Error: {e}")

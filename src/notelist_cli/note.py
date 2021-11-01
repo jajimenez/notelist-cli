@@ -43,10 +43,7 @@ def get_ls_header() -> str:
 
     :returns: Header.
     """
-    return (
-        "ID" + (" " * 31) + "| Title" + (" " * 16) + "| Tags" + (" " * 16) +
-        "\n"
-    )
+    return "ID" + (" " * 31) + "| Title" + (" " * 36) + "| Tags\n"
 
 
 def get_ls_note_line(note: dict) -> str:
@@ -61,10 +58,10 @@ def get_ls_note_line(note: dict) -> str:
 
     c = len(title)
 
-    if c <= 20:
-        title = title + (" " * (20 - c))
+    if c <= 40:
+        title = title + (" " * (40 - c))
     else:
-        title = f"{title[:17]}..."
+        title = f"{title[:37]}..."
 
     line += title + " | "
 
@@ -72,10 +69,10 @@ def get_ls_note_line(note: dict) -> str:
         tags = ", ".join(tags)
         c = len(tags)
 
-        if c <= 20:
-            tags = tags + (" " * (20 - c))
+        if c <= 40:
+            tags = tags + (" " * (40 - c))
         else:
-            tags = f"{tags[:17]}..."
+            tags = f"{tags[:37]}..."
 
         line += tags
 
@@ -93,7 +90,7 @@ def print_notes(notes: list[dict]):
 
     :param notes: Notes.
     """
-    echo("\n" + get_ls_header())
+    echo(get_ls_header())
 
     for n in notes:
         echo(get_ls_note_line(n))
@@ -140,9 +137,10 @@ def ls(
 
         if c > 0:
             print_notes(notes)
+            echo()
 
         s = "s" if c != 1 else ""
-        echo(f"\n{c} note{s}\n")
+        echo(f"{c} note{s}")
     except Exception as e:
         sys.exit(f"Error: {e}")
 
@@ -186,7 +184,7 @@ def get(id: str):
         nb_name = res["name"]
 
         # Print note
-        echo("\nID:" + (" " * 12) + _id)
+        echo("ID:" + (" " * 12) + _id)
         echo("Notebook ID:" + (" " * 3) + nb_id)
         echo(f"Notebook name: {nb_name}")
         echo("Archived:" + (" " * 6) + archived)
@@ -203,8 +201,6 @@ def get(id: str):
 
         if body is not None:
             echo("\n" + body)
-
-        echo()
     except Exception as e:
         sys.exit(f"Error: {e}")
 
